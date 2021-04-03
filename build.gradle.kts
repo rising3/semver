@@ -87,8 +87,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/rising3/semver")
             credentials {
-                val actor = project.findProperty("github.actor") as String?
-                val token = project.findProperty("github.token") as String?
+                val actor = project.findProperty("gpr.actor") as String?
+                val token = project.findProperty("gpr.token") as String?
                 username = actor ?: System.getenv("GITHUB_ACTOR")
                 password = token ?: System.getenv("GITHUB_TOKEN")
             }
