@@ -163,6 +163,7 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
          * @return SemVer
          * @throws IllegalArgumentException Invalid format
          */
+        @JvmStatic
         fun parse(s: String): SemVer {
             val p =
                 listOfNotNull(
