@@ -28,7 +28,7 @@ import java.lang.IllegalArgumentException
  * @param[preid] pre-id(option)
  * @param[prerelease] pre-release number(option)
  */
-class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelease: Int? = null) {
+class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelease: Int? = null) : Comparable<SemVer> {
     /**
      * Default pre-release
      */
@@ -132,11 +132,6 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
         if (this.preid == preid) calcPrerelease(preid) + 1 else defaultPrerelease
     )
 
-    /**
-     * Get semantic versioning string.
-     *
-     * @return Semantic versioning string.
-     */
     override fun toString() = String.format(
         "%d.%d.%d%s%s%s",
         major,
@@ -146,6 +141,27 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
         if (preid != null) "$preid." else "",
         if (prerelease != null) "$prerelease" else ""
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SemVer
+        if (major != other.major) return false
+        if (minor != other.minor) return false
+        if (patch != other.patch) return false
+        if (preid != other.preid) return false
+        if (prerelease != other.prerelease) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return major * 31 + minor * 31 + patch * 31 + (preid?.hashCode() ?: 0) * 31 + (prerelease ?: 0)
+    }
+
+    override fun compareTo(other: SemVer): Int {
+        return compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch, SemVer::preid, SemVer::prerelease)
+    }
 
     /**
      * calculate pre-release number.

@@ -46,6 +46,55 @@ class SemVerTest {
     }
 
     @Test
+    fun `equals`() {
+        val actual = SemVer(1, 2, 3, "RC", 4)
+        assertAll(
+            Executable { assertFalse(actual.equals(1)) },
+            Executable { assertFalse(actual.equals("String")) },
+            Executable { assertFalse(SemVer.parse("1.2.3") == actual) },
+            Executable { assertTrue(SemVer.parse("1.2.3-RC.4") == actual) },
+        )
+    }
+
+    @Test
+    fun `hashcode`() {
+        assertAll(
+            Executable { assertEquals(SemVer.parse("1.2.3").hashCode(), SemVer.parse("1.2.3").hashCode()) },
+            Executable { assertEquals(SemVer.parse("1.2.3-RC.4").hashCode(), SemVer.parse("1.2.3-RC.4").hashCode()) },
+        )
+    }
+
+    @Test
+    fun `compareTo`() {
+        assertAll(
+            Executable { assertTrue(SemVer.parse("0.0.5") == SemVer.parse("0.0.5")) },
+            Executable { assertTrue(SemVer.parse("0.0.5") > SemVer.parse("0.0.1")) },
+            Executable { assertTrue(SemVer.parse("0.0.5") < SemVer.parse("0.0.9")) },
+            Executable { assertTrue(SemVer.parse("0.5.5") == SemVer.parse("0.5.5")) },
+            Executable { assertTrue(SemVer.parse("0.5.5") > SemVer.parse("0.5.1")) },
+            Executable { assertTrue(SemVer.parse("0.5.5") < SemVer.parse("0.5.9")) },
+            Executable { assertTrue(SemVer.parse("5.5.0") == SemVer.parse("5.5.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0") > SemVer.parse("5.1.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0") < SemVer.parse("5.9.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") > SemVer.parse("5.5.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") > SemVer.parse("5.1.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") < SemVer.parse("5.9.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") == SemVer.parse("5.5.0-5")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") > SemVer.parse("5.5.0-1")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-5") < SemVer.parse("5.5.0-9")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.1.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.9.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0-A.5")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0-A.1")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0-A.9")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.5")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.1")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.9")) },
+        )
+    }
+
+    @Test
     fun `to String`() = assertEquals("1.2.3", SemVer(1, 2, 3).toString())
 
     @ParameterizedTest
