@@ -19,7 +19,7 @@ jobs:
         run: |
           cat << EOS > ~/.gradle/gradle.properties
           author=rising3
-          email=micho.nakagawa@gmail.com
+          email=michio.nakagawa@gmail.com
           EOS
       - name: Build
         run: gradle build

@@ -130,6 +130,6 @@ license {
     header = rootProject.file("codequality/HEADER")
     strictCheck = true
     license.ext["year"] = Calendar.getInstance().get(Calendar.YEAR)
-    license.ext["name"] = project.findProperty("author")
-    license.ext["email"] = project.findProperty("email")
+    license.ext["name"] = project.findProperty("author") ?: System.getenv("ENV_AUTHOR")
+    license.ext["email"] = project.findProperty("email") ?: System.getenv("ENV_EMAIL")
 }

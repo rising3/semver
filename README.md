@@ -1,4 +1,4 @@
-# SemVer
+# SemVer [![CI](https://github.com/rising3/semver/actions/workflows/build.yml/badge.svg)](https://github.com/rising3/semver/actions/workflows/build.yml)
 
 SemVer is a set of Java libraries from the [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
