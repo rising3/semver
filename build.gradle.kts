@@ -10,7 +10,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.20"
     id("com.github.hierynomus.license") version "0.15.0"
     id("com.diffplug.spotless") version "5.11.0"
-    id("com.github.rising3.semver") version "0.2.0"
+    id("com.github.rising3.semver") version "0.3.0"
 }
 
 group = "com.github.rising3"
