@@ -156,11 +156,32 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
     }
 
     override fun hashCode(): Int {
-        return major * 31 + minor * 31 + patch * 31 + (preid?.hashCode() ?: 0) * 31 + (prerelease ?: 0)
+        var hash = 7
+        hash = 31 * hash + major
+        hash = 31 * hash + minor
+        hash = 31 * hash + patch
+        hash = 31 * hash + (preid?.hashCode() ?: 0)
+        hash = 31 * hash + (prerelease ?: 0)
+        return hash
     }
 
     override fun compareTo(other: SemVer): Int {
-        return compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch, SemVer::preid, SemVer::prerelease)
+        if ((this.preid != null && other.preid != null) || (this.prerelease != null && other.prerelease != null)) {
+            return compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch, SemVer::preid, SemVer::prerelease)
+        } else {
+            var cmp = compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch)
+            return if (cmp == 0 && this.preid == null) {
+                1
+            } else if (cmp == 0 && other.preid == null) {
+                -1
+            } else if (cmp == 0 && this.prerelease == null) {
+                1
+            } else if (cmp == 0 && other.prerelease == null) {
+                -1
+            } else {
+                cmp
+            }
+        }
     }
 
     /**
@@ -182,20 +203,25 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
         @JvmStatic
         fun parse(s: String): SemVer {
             val p =
-                listOfNotNull(
-                    Regex("""^\d+\.\d+\.\d+-\w+\.\d+$""").find(s),
-                    Regex("""^\d+\.\d+\.\d+-\d+$""").find(s),
-                    Regex("""^\d+\.\d+\.\d+$""").find(s),
-                )
-            if (p.isEmpty()) {
-                throw IllegalArgumentException("Illegal argument: $s")
+                Regex("""^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?${'$'}""")
+                    .find(s)
+                    ?: throw IllegalArgumentException("Illegal argument: $s")
+            val major = p.groups[1]!!.value.toInt()
+            val minor = p.groups[2]!!.value.toInt()
+            val patch = p.groups[3]!!.value.toInt()
+            val wk = p.groups[4]?.value?.split(".")
+            var preid = if (wk?.size ?: 0 == 1) {
+                if (wk!![0].toIntOrNull() == null) wk[0] else null
+            } else if (wk?.size ?: 0 > 1) {
+                val t = if (wk?.last()?.toIntOrNull() == null) 0 else 1
+                wk!!.joinToString(separator = ".", limit = wk.size - t, truncated = "").dropLast(t)
+            } else {
+                null
             }
-            val v = p[0].value.replace("-", ".").split(".")
-            return when (v.count()) {
-                5 -> SemVer(v[0].toInt(), v[1].toInt(), v[2].toInt(), v[3], v[4].toInt())
-                4 -> SemVer(v[0].toInt(), v[1].toInt(), v[2].toInt(), null, v[3].toInt())
-                else -> SemVer(v[0].toInt(), v[1].toInt(), v[2].toInt())
-            }
+            val prerelease = p.groups[4]?.value?.toIntOrNull()
+                ?: wk?.last()?.toIntOrNull()
+                ?: if (preid == null) null else 0
+            return SemVer(major, minor, patch, preid, prerelease)
         }
     }
 }

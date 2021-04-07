@@ -82,7 +82,7 @@ class SemVerTest {
             Executable { assertTrue(SemVer.parse("5.5.0-5") == SemVer.parse("5.5.0-5")) },
             Executable { assertTrue(SemVer.parse("5.5.0-5") > SemVer.parse("5.5.0-1")) },
             Executable { assertTrue(SemVer.parse("5.5.0-5") < SemVer.parse("5.5.0-9")) },
-            Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0")) },
+            Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0")) },
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.1.0")) },
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.9.0")) },
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") > SemVer.parse("5.5.0-A.5")) },
@@ -91,6 +91,13 @@ class SemVerTest {
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.5")) },
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.1")) },
             Executable { assertTrue(SemVer.parse("5.5.0-M.5") < SemVer.parse("5.5.0-Z.9")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-alpha") < SemVer.parse("1.0.0-alpha.1")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-alpha.1") < SemVer.parse("1.0.0-alpha.beta")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-alpha.beta") < SemVer.parse("1.0.0-beta")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-beta") < SemVer.parse("1.0.0-beta.2")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-beta.2") < SemVer.parse("1.0.0-beta.11")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-beta.11") < SemVer.parse("1.0.0-rc.1")) },
+            Executable { assertTrue(SemVer.parse("1.0.0-rc.1") < SemVer.parse("1.0.0")) },
         )
     }
 
@@ -120,6 +127,9 @@ class SemVerTest {
                 Arguments.of("1.2.3", "1.2.3"),
                 Arguments.of("1.2.3-1", "1.2.3-1"),
                 Arguments.of("1.2.3-M.1", "1.2.3-M.1"),
+                Arguments.of("1.2.3-M.RC.1", "1.2.3-M.RC.1"),
+                Arguments.of("1.2.3-M", "1.2.3-M.0"),
+                Arguments.of("1.2.3-M.RC", "1.2.3-M.RC.0"),
                 Arguments.of("123.456.789", "123.456.789"),
                 Arguments.of("1", IllegalArgumentException::class.java),
                 Arguments.of("1.", IllegalArgumentException::class.java),
