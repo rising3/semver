@@ -7,6 +7,7 @@ plugins {
     eclipse
     idea
     `maven-publish`
+    signing
     id("org.jetbrains.dokka") version "1.4.20"
     id("com.github.hierynomus.license") version "0.15.0"
     id("com.diffplug.spotless") version "5.11.0"
@@ -23,7 +24,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.32")
 }
 
@@ -72,16 +73,38 @@ tasks.dokkaJavadoc.configure {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        create<MavenPublication>("mavenJava") {
             groupId = project.group as String
             artifactId = project.name
             version = project.version as String
             from(components["java"])
             artifact(javadocJar)
             artifact(sourcesJar)
+            pom {
+                name.set(project.name)
+                description.set("SemVer is a set of Java libraries from the Semantic Versioning.")
+                url.set("https://maven.pkg.github.com/rising3/semver")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("rising3")
+                        name.set("Michio Nakagawa")
+                        email.set("michio.nakagawa@gmail.com")
+                    }
+                }
+                scm {
+                    connection.set("git@github.com:rising3/semver.git")
+                    developerConnection.set("git@github.com:rising3/semver.git")
+                    url.set("https://github.com/rising3/semver")
+                }
+            }
         }
     }
-
     repositories {
         maven {
             name = "GitHubPackages"
@@ -93,7 +116,21 @@ publishing {
                 password = token ?: System.getenv("GITHUB_TOKEN")
             }
         }
+        maven {
+            name = "sonatype"
+            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+            credentials {
+                username = project.findProperty("sonatype.username") as String?
+                password = project.findProperty("sonatype.password") as String?
+            }
+        }
     }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
 
 tasks.test {
