@@ -32,7 +32,7 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
     /**
      * Default pre-release
      */
-    private val defaultPrerelease: Int = 1
+    private val defaultPrerelease: Int = 0
 
     /**
      * major number
@@ -166,22 +166,13 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
     }
 
     override fun compareTo(other: SemVer): Int {
-        if ((this.preid != null && other.preid != null) || (this.prerelease != null && other.prerelease != null)) {
-            return compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch, SemVer::preid, SemVer::prerelease)
-        } else {
-            var cmp = compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch)
-            return if (cmp == 0 && this.preid == null) {
-                1
-            } else if (cmp == 0 && other.preid == null) {
-                -1
-            } else if (cmp == 0 && this.prerelease == null) {
-                1
-            } else if (cmp == 0 && other.prerelease == null) {
-                -1
-            } else {
-                cmp
-            }
-        }
+        val cmp = compareValuesBy(this, other, SemVer::major, SemVer::minor, SemVer::patch)
+        val pre = compareValuesBy(this, other, SemVer::preid, SemVer::prerelease)
+        // 1.0.0.RC.1 < 1.0.0
+        // https://semver.org/#spec-item-11
+        return if (cmp == 0 && (this.prerelease == null || other.prerelease == null)) {
+            pre * -1
+        } else if (cmp != 0) cmp else pre
     }
 
     /**
@@ -210,9 +201,10 @@ class SemVer(major: Int, minor: Int, patch: Int, preid: String? = null, prerelea
             val minor = p.groups[2]!!.value.toInt()
             val patch = p.groups[3]!!.value.toInt()
             val wk = p.groups[4]?.value?.split(".")
-            var preid = if (wk?.size ?: 0 == 1) {
+            val wkSize = wk?.size ?: 0
+            val preid = if (wkSize == 1) {
                 if (wk!![0].toIntOrNull() == null) wk[0] else null
-            } else if (wk?.size ?: 0 > 1) {
+            } else if (wkSize > 1) {
                 val t = if (wk?.last()?.toIntOrNull() == null) 0 else 1
                 wk!!.joinToString(separator = ".", limit = wk.size - t, truncated = "").dropLast(t)
             } else {
