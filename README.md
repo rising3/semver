@@ -7,9 +7,9 @@ SemVer is a set of Java libraries from the [Semantic Versioning](https://semver.
 
 ## Adding SemVer to your build
 
-SemVer Maven group ID is com.github.rising3, and its artifact ID is semver.
+SemVer Maven group ID is `com.github.rising3`, and its artifact ID is `semver`.
 
-To add a dependency on Guava using Maven, use the following:
+To add a dependency on semver using Maven, use the following:
 ``` xml
 <dependency>
   <groupId>com.github.rising3</groupId>
@@ -24,6 +24,7 @@ dependencies {
     implementation("com.github.rising3:semver:{version}")
 }
 ```
+[More...](https://search.maven.org/artifact/com.github.rising3/semver)
 
 ## License
 
