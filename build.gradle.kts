@@ -1,4 +1,8 @@
+import groovy.lang.GroovySystem
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Calendar
+
 
 plugins {
     java
@@ -34,8 +38,13 @@ val install by tasks.creating() {
 
 val jar by tasks.getting(Jar::class) {
     manifest {
-        attributes["Implementation-Title"] = "semver"
+        attributes["Implementation-Title"] = project.name
         attributes["Implementation-Version"] = project.version
+        attributes["Implementation-Id"] = "${project.group}:${project.name}:${project.version}"
+        attributes["Created-By"] = "${System.getProperty("java.version")}(${System.getProperty("java.vendor")})"
+        attributes["Built-With"] = "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.getVersion()}"
+        attributes["Build-Time"] = "${ZonedDateTime.now(ZoneId.of("UTC"))}"
+        attributes["License"] = "The Apache License, Version 2.0"
     }
 }
 
@@ -83,7 +92,7 @@ publishing {
             pom {
                 name.set(project.name)
                 description.set("SemVer is a set of Java libraries from the Semantic Versioning.")
-                url.set("https://maven.pkg.github.com/rising3/semver")
+                url.set("https://github.com/rising3/semver")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
